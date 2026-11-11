@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "toolNames": [
+    "search_issues",
+    "list_issues",
+    "get_user",
+    "find_user",
+    "create_issue"
+  ],
+  "prompts": [
+    {
+      "id": "search_issues#0",
+      "text": "Find issues that mention the flaky checkout test",
+      "expected": "search_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "search_issues#1",
+      "text": "Are there any bug reports about login timeouts?",
+      "expected": "search_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "search_issues#2",
+      "text": "Look for tickets containing the phrase 'null pointer' in myorg/api",
+      "expected": "search_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "search_issues#3",
+      "text": "Which issues talk about dark mode support?",
+      "expected": "search_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "search_issues#4",
+      "text": "Search for anything related to the payment webhook failing",
+      "expected": "search_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "search_issues#5",
+      "text": "Show me issues where someone mentions rate limiting",
+      "expected": "search_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "search_issues#6",
+      "text": "I want the tickets that discuss the migration, not the whole list",
+      "expected": "search_issues",
+      "kind": "near-miss"
+    },
+    {
+      "id": "search_issues#7",
+      "text": "Pull up issues about CSV export, I don't need everything in the repo",
+      "expected": "search_issues",
+      "kind": "near-miss"
+    },
+    {
+      "id": "list_issues#0",
+      "text": "Show me all open issues in myorg/api",
+      "expected": "list_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "list_issues#1",
+      "text": "List every issue in the frontend repo",
+      "expected": "list_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "list_issues#2",
+      "text": "What issues does the docs repository have right now?",
+      "expected": "list_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "list_issues#3",
+      "text": "Give me the full backlog for myorg/mobile",
+      "expected": "list_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "list_issues#4",
+      "text": "Dump all issues in myorg/infra so I can triage them",
+      "expected": "list_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "list_issues#5",
+      "text": "Enumerate the issues in the billing repo",
+      "expected": "list_issues",
+      "kind": "direct"
+    },
+    {
+      "id": "list_issues#6",
+      "text": "Browse through the issues in myorg/web, no particular topic",
+      "expected": "list_issues",
+      "kind": "near-miss"
+    },
+    {
+      "id": "list_issues#7",
+      "text": "Get the complete set of issues for the sdk repo without filtering by keyword",
+      "expected": "list_issues",
+      "kind": "near-miss"
+    },
+    {
+      "id": "get_user#0",
+      "text": "Fetch the profile for user id 48213",
+      "expected": "get_user",
+      "kind": "direct"
+    },
+    {
+      "id": "get_user#1",
+      "text": "Get the account with id u_90210",
+      "expected": "get_user",
+      "kind": "direct"
+    },
+    {
+      "id": "get_user#2",
+      "text": "Look up user 7731 and show their email",
+      "expected": "get_user",
+      "kind": "direct"
+    },
+    {
+      "id": "get_user#3",
+      "text": "Retrieve the details of user id 55",
+      "expected": "get_user",
+      "kind": "direct"
+    },
+    {
+      "id": "get_user#4",
+      "text": "What is the signup date for account id 1029?",
+      "expected": "get_user",
+      "kind": "direct"
+    },
+    {
+      "id": "get_user#5",
+      "text": "Pull the record for user id x_4412",
+      "expected": "get_user",
+      "kind": "direct"
+    },
+    {
+      "id": "get_user#6",
+      "text": "I have the exact user id 3003, show me that person",
+      "expected": "get_user",
+      "kind": "near-miss"
+    },
+    {
+      "id": "get_user#7",
+      "text": "Open the profile of the user whose id is abc-123",
+      "expected": "get_user",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_user#0",
+      "text": "Find the user named Priya Sharma",
+      "expected": "find_user",
+      "kind": "direct"
+    },
+    {
+      "id": "find_user#1",
+      "text": "Is there a user called Marcus Lee?",
+      "expected": "find_user",
+      "kind": "direct"
+    },
+    {
+      "id": "find_user#2",
+      "text": "Search for a user whose name is Ana Torres",
+      "expected": "find_user",
+      "kind": "direct"
+    },
+    {
+      "id": "find_user#3",
+      "text": "Which account belongs to someone named Chen Wei?",
+      "expected": "find_user",
+      "kind": "direct"
+    },
+    {
+      "id": "find_user#4",
+      "text": "Look for people named Sam in our system",
+      "expected": "find_user",
+      "kind": "direct"
+    },
+    {
+      "id": "find_user#5",
+      "text": "Who is Olga Petrova in the user directory?",
+      "expected": "find_user",
+      "kind": "direct"
+    },
+    {
+      "id": "find_user#6",
+      "text": "I only know their name, Tomas Novak, not an id",
+      "expected": "find_user",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_user#7",
+      "text": "Track down the person called Fatima Khan",
+      "expected": "find_user",
+      "kind": "near-miss"
+    },
+    {
+      "id": "create_issue#0",
+      "text": "Open a bug in myorg/api: login returns 500",
+      "expected": "create_issue",
+      "kind": "direct"
+    },
+    {
+      "id": "create_issue#1",
+      "text": "File a feature request for dark mode in the web repo",
+      "expected": "create_issue",
+      "kind": "direct"
+    },
+    {
+      "id": "create_issue#2",
+      "text": "Report that the export button is broken in myorg/app",
+      "expected": "create_issue",
+      "kind": "direct"
+    },
+    {
+      "id": "create_issue#3",
+      "text": "Create a ticket titled 'Slow search' in myorg/search",
+      "expected": "create_issue",
+      "kind": "direct"
+    },
+    {
+      "id": "create_issue#4",
+      "text": "Log a new issue: typo on the pricing page",
+      "expected": "create_issue",
+      "kind": "direct"
+    },
+    {
+      "id": "create_issue#5",
+      "text": "Raise an issue in the sdk repo about missing retries",
+      "expected": "create_issue",
+      "kind": "direct"
+    }
+  ]
+}

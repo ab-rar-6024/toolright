@@ -1,0 +1,17 @@
+name: Toolright lint
+description: Fail the build when MCP tool descriptions are missing, vague, or confusable. No API key needed.
+inputs:
+  tools:
+    description: Path to a tools snapshot JSON made with `toolright list --json`
+    required: true
+  fail-on:
+    description: error | warn | info | none
+    default: error
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - shell: bash
+      run: npx --yes toolright lint --tools "${{ inputs.tools }}" --fail-on "${{ inputs.fail-on }}"

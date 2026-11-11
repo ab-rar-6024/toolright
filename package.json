@@ -1,0 +1,52 @@
+{
+  "name": "toolright",
+  "version": "0.0.1",
+  "description": "Does your agent pick the right tool? Test MCP tool descriptions with real models and keep only the rewrites that help.",
+  "type": "module",
+  "bin": {
+    "toolright": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "tool-calling",
+    "llm",
+    "evaluation",
+    "agents"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "commander": "^15.1.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  },
+  "optionalDependencies": {
+    "@huggingface/transformers": "^4.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ab-rar-6024/toolright.git"
+  },
+  "homepage": "https://github.com/ab-rar-6024/toolright#readme",
+  "bugs": {
+    "url": "https://github.com/ab-rar-6024/toolright/issues"
+  }
+}
