@@ -38,9 +38,6 @@
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
   },
-  "optionalDependencies": {
-    "@huggingface/transformers": "^4.3.2"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ab-rar-6024/toolright.git"
@@ -48,5 +45,13 @@
   "homepage": "https://github.com/ab-rar-6024/toolright#readme",
   "bugs": {
     "url": "https://github.com/ab-rar-6024/toolright/issues"
+  },
+  "peerDependencies": {
+    "@huggingface/transformers": "^4.3.2"
+  },
+  "peerDependenciesMeta": {
+    "@huggingface/transformers": {
+      "optional": true
+    }
   }
 }
