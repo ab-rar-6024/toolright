@@ -8,6 +8,7 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 [![CI](https://img.shields.io/github/actions/workflow/status/ab-rar-6024/toolright/ci.yml?style=flat-square&label=CI)](https://github.com/ab-rar-6024/toolright/actions)
 [![npm](https://img.shields.io/npm/v/toolright?style=flat-square)](https://www.npmjs.com/package/toolright)
+[![PyPI](https://img.shields.io/pypi/v/toolright?style=flat-square)](https://pypi.org/project/toolright/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-339933?style=flat-square)](package.json)
 [![Stars](https://img.shields.io/github/stars/ab-rar-6024/toolright?style=flat-square)](https://github.com/ab-rar-6024/toolright/stargazers)
@@ -24,9 +25,12 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 ```bash
 npm install -g toolright      # installs the `toolright` command
+pip install toolright         # same command, via a thin Python launcher (needs Node.js 20+)
 ```
 
 Or run it without installing: `npx toolright <command>`.
+
+The pip package is only a launcher: Toolright is a Node.js tool, and `pip install toolright` runs the npm package of the same version through `npx`. See [`python/`](python).
 
 | Prerequisite | Needed for |
 |---|---|
@@ -58,6 +62,7 @@ From a clone: `npm install && npm run dev -- lint -- node my-server.js`.
 | Package | What it does | Install |
 |---|---|---|
 | [`toolright`](https://www.npmjs.com/package/toolright) (npm) | The CLI: lint, gen, eval, tune | `npm install -g toolright` |
+| [`toolright`](https://pypi.org/project/toolright/) (PyPI) | Python launcher for the same CLI (needs Node.js 20+) | `pip install toolright` |
 
 ## Why Toolright
 
