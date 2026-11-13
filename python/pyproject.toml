@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "toolright"
-version = "0.0.1"
+version = "0.0.2"
 description = "Does your agent pick the right tool? Test MCP tool descriptions against real models. Python launcher for the Toolright Node.js CLI."
 readme = "README.md"
 requires-python = ">=3.8"

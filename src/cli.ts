@@ -3,6 +3,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { Command, InvalidArgumentError } from "commander";
+import { depthOf, renderBanner, renderTag, shouldShowBanner } from "./brand.js";
+import { VERSION } from "./version.js";
 import { Budget, BudgetExceeded, estimateTokensPerCall, evaluate } from "./eval/run.js";
 import { generatePrompts, loadPrompts, savePrompts, type TestPrompt } from "./gen/prompts.js";
 import { exitCode, formatLint, lint } from "./lint/index.js";
@@ -14,7 +16,17 @@ import { descriptionDiff, evalReport, tuneJson, tuneReport } from "./report/inde
 import { tune } from "./tune/index.js";
 
 const program = new Command();
-program.name("toolright").description("Does your agent pick the right tool?").version("0.0.1");
+program.name("toolright").description("Does your agent pick the right tool?").version(VERSION);
+
+// Branding: only on an interactive terminal (never in pipes, --json output or CI), color adapts to the terminal.
+program.addHelpText("beforeAll", (ctx) => {
+  const stream = ctx.error ? process.stderr : process.stdout;
+  return shouldShowBanner(stream) ? renderBanner(depthOf(stream), VERSION) : "";
+});
+program.hook("preAction", (_command, action) => {
+  if (action.opts().json || !shouldShowBanner(process.stderr)) return;
+  process.stderr.write(`${renderTag(depthOf(process.stderr), VERSION)}\n`);
+});
 
 const log = (m: string) => console.error(m);
 
