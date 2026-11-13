@@ -19,7 +19,7 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 ---
 
-> **Status: v0.0.2, pre-release.** 68 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run), but everything that talks to a model was tested against **fake OpenAI/Anthropic-compatible servers and a stand-in picker**. It has **not yet been run against live Anthropic, OpenAI, Gemini, Groq or Ollama endpoints**, and there are **no published before/after results on real MCP servers yet**. Please report what breaks.
+> **Status: v0.0.2, pre-release.** 83 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run), but everything that talks to a model was tested against **fake OpenAI/Anthropic-compatible servers and a stand-in picker**. It has **not yet been run against live Anthropic, OpenAI, Gemini, Groq or Ollama endpoints**, and there are **no published before/after results on real MCP servers yet**. Please report what breaks.
 
 ## Install
 
@@ -189,7 +189,7 @@ Issues and pull requests are welcome. Start with a failing test that shows the p
 
 ```bash
 npm install
-npm test          # 68 tests: unit, integration, security; no network or keys needed
+npm test          # 83 tests: unit, integration, security; no network or keys needed
 npm run typecheck
 npm run build
 ```
