@@ -1,3 +1,5 @@
+import type { Command } from "commander";
+
 /**
  * Terminal branding: a block-letter TOOLRIGHT banner with a color gradient.
  *
@@ -99,9 +101,10 @@ export function renderTag(depth: number, version: string): string {
   return `${BOLD}${word}${RESET} ${DIM}v${version}${RESET}`;
 }
 
-interface StreamLike {
+export interface StreamLike {
   isTTY?: boolean;
   getColorDepth?: (env?: NodeJS.ProcessEnv) => number;
+  write?: (chunk: string) => unknown;
 }
 
 /** Banner only on an interactive terminal, and never in CI or when the user opts out. */
@@ -120,4 +123,43 @@ export function depthOf(stream: StreamLike, env: NodeJS.ProcessEnv = process.env
   } catch {
     return 1;
   }
+}
+
+export interface BrandingOptions {
+  version: string;
+  /** injectable for tests; default to the real process streams */
+  stdout?: StreamLike;
+  stderr?: StreamLike;
+  env?: NodeJS.ProcessEnv;
+}
+
+/**
+ * Wire the branding into a commander program:
+ *  - the full banner above help output (on whichever stream help is written to), and
+ *  - a one-line tag before each command, on stderr, skipped for --json.
+ * When the banner is shown it already carries the tagline, so the root command's own
+ * description is dropped from help to avoid printing the same sentence twice. Subcommand
+ * descriptions are unaffected, and without a banner (pipes, CI) the description stays.
+ */
+export function attachBranding(program: Command, o: BrandingOptions): void {
+  const out: StreamLike = o.stdout ?? process.stdout;
+  const err: StreamLike = o.stderr ?? process.stderr;
+  const env = o.env ?? process.env;
+  let bannerShown = false;
+
+  program.addHelpText("beforeAll", (ctx) => {
+    const stream = ctx.error ? err : out;
+    bannerShown = shouldShowBanner(stream, env);
+    return bannerShown ? renderBanner(depthOf(stream, env), o.version) : "";
+  });
+
+  program.configureHelp({
+    commandDescription: (cmd) => (cmd === program && bannerShown ? "" : cmd.description()),
+  });
+
+  program.hook("preAction", (_command, action) => {
+    if (action.opts().json || !shouldShowBanner(err, env)) return;
+    err.write?.(`${renderTag(depthOf(err, env), o.version)}
+`);
+  });
 }

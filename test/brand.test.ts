@@ -96,3 +96,54 @@ describe("CLI output stays clean when not a terminal", () => {
     expect(() => JSON.parse(r.stdout)).not.toThrow();
   });
 });
+
+describe("help output has the tagline exactly once", () => {
+  const TAGLINE = "Does your agent pick the right tool?";
+  const count = (text: string) => text.split(TAGLINE).length - 1;
+
+  async function helpFor(opts: { tty: boolean; depth?: number; sub?: boolean; env?: NodeJS.ProcessEnv }) {
+    const { Command } = await import("commander");
+    const { attachBranding } = await import("../src/brand.js");
+    const program = new Command();
+    program.name("toolright").description(TAGLINE).version("9.9.9");
+    let out = "";
+    let err = "";
+    program.configureOutput({ writeOut: (s) => (out += s), writeErr: (s) => (err += s) });
+    program.exitOverride();
+    program.command("lint").description("Tier 1: instant checks"); // created after, so it inherits the capture
+    const stream = (sink: (s: string) => void) => ({ isTTY: opts.tty, getColorDepth: () => opts.depth ?? 1, write: (s: string) => sink(s) });
+    attachBranding(program, { version: "9.9.9", stdout: stream((s) => (out += s)), stderr: stream((s) => (err += s)), env: opts.env ?? {} });
+    try {
+      await program.parseAsync(["node", "toolright", ...(opts.sub ? ["lint", "--help"] : ["--help"])]);
+    } catch {
+      /* exitOverride throws after printing help */
+    }
+    return out + err;
+  }
+
+  it("on a terminal: banner shows the tagline once, and the description is not repeated", async () => {
+    const text = await helpFor({ tty: true });
+    expect(text).toContain(String.fromCharCode(0x2588)); // banner is there
+    expect(count(text)).toBe(1);
+    expect(text).toContain("Usage: toolright");
+    expect(text).toContain("Commands:");
+  });
+
+  it("with color on, still exactly one tagline", async () => {
+    expect(count(strip(await helpFor({ tty: true, depth: 24 })))).toBe(1);
+  });
+
+  it("not a terminal (pipe / CI / opt-out): no banner, and the description IS shown", async () => {
+    for (const opts of [{ tty: false }, { tty: true, env: { CI: "true" } }, { tty: true, env: { TOOLRIGHT_NO_BANNER: "1" } }]) {
+      const text = await helpFor(opts);
+      expect(text).not.toContain(String.fromCharCode(0x2588));
+      expect(count(text)).toBe(1);
+    }
+  });
+
+  it("a subcommand keeps its own description when the banner is shown", async () => {
+    const text = await helpFor({ tty: true, sub: true });
+    expect(text).toContain("Tier 1: instant checks");
+    expect(text).toContain(String.fromCharCode(0x2588));
+  });
+});
