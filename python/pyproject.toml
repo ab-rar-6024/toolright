@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toolright"
+version = "0.0.1"
+description = "Does your agent pick the right tool? Test MCP tool descriptions against real models. Python launcher for the Toolright Node.js CLI."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["mcp", "model-context-protocol", "llm", "evaluation", "tool-calling", "agents"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: JavaScript",
+  "Topic :: Software Development :: Testing",
+]
+
+[project.urls]
+Homepage = "https://github.com/ab-rar-6024/toolright"
+Repository = "https://github.com/ab-rar-6024/toolright"
+Issues = "https://github.com/ab-rar-6024/toolright/issues"
+npm = "https://www.npmjs.com/package/toolright"
+
+[project.scripts]
+toolright = "toolright:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

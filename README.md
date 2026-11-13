@@ -12,33 +12,52 @@ Test your MCP server's tool descriptions against real models, then keep only the
 [![Node](https://img.shields.io/badge/node-%3E%3D20-339933?style=flat-square)](package.json)
 [![Stars](https://img.shields.io/github/stars/ab-rar-6024/toolright?style=flat-square)](https://github.com/ab-rar-6024/toolright/stargazers)
 
-[Quick Start](#quick-start) | [Why Toolright](#why-toolright) | [How It Works](#how-it-works) | [Commands](#commands) | [Security](#security) | [Contributing](#contributing)
+[Install](#install) | [Quick Start](#quick-start) | [Why Toolright](#why-toolright) | [How It Works](#how-it-works) | [Commands](#commands) | [Security](#security) | [Contributing](#contributing)
 
 </div>
-
-<!-- The npm badge shows "not found" until the package is published. -->
 
 ---
 
 > **Status: v0.0.1, pre-release.** 68 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run), but everything that talks to a model was tested against **fake OpenAI/Anthropic-compatible servers and a stand-in picker**. It has **not yet been run against live Anthropic, OpenAI, Gemini, Groq or Ollama endpoints**, and there are **no published before/after results on real MCP servers yet**. Please report what breaks.
 
+## Install
+
+```bash
+npm install -g toolright      # installs the `toolright` command
+```
+
+Or run it without installing: `npx toolright <command>`.
+
+| Prerequisite | Needed for |
+|---|---|
+| Node.js 20+ | Everything |
+| An MCP server to check | Everything (or a saved snapshot, see `toolright list --json`) |
+| [Ollama](https://ollama.com) | Tier 2 only (local models) |
+| An API key for a cloud model | Tier 3 only |
+
 ## Quick Start
 
-Prerequisites: Node.js 20+ and an MCP server to check. Tier 1 needs nothing else.
+Tier 1 needs no key and no model.
 
 ```bash
 # 1. See what your server exposes
-npx toolright list -- node my-server.js
+toolright list -- node my-server.js
 
-# 2. Find look-alike and vague tools in about a second. No model, no API key.
-npx toolright lint -- node my-server.js
+# 2. Find look-alike and vague tools in about a second
+toolright lint -- node my-server.js
 
 # 3. Measure real model behavior (local and free with Ollama, or any cloud model)
-npx toolright gen  --generator ollama:qwen2.5:3b -o prompts.json -- node my-server.js
-npx toolright eval -m ollama:qwen2.5:3b --prompts prompts.json -- node my-server.js
+toolright gen  --generator ollama:qwen2.5:3b -o prompts.json -- node my-server.js
+toolright eval -m ollama:qwen2.5:3b --prompts prompts.json -- node my-server.js
 ```
 
 From a clone: `npm install && npm run dev -- lint -- node my-server.js`.
+
+## Ecosystem
+
+| Package | What it does | Install |
+|---|---|---|
+| [`toolright`](https://www.npmjs.com/package/toolright) (npm) | The CLI: lint, gen, eval, tune | `npm install -g toolright` |
 
 ## Why Toolright
 
