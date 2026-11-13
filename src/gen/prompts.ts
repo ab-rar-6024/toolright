@@ -28,6 +28,8 @@ export interface GenOptions {
   /** tool name -> names of its most confusable siblings (from lint) */
   siblings?: Map<string, string[]>;
   onProgress?: (done: number, total: number) => void;
+  /** called for anything that silently reduces the prompt set (failed generation, filtered prompts) */
+  onWarn?: (message: string) => void;
 }
 
 const GEN_SYSTEM = `You write realistic test requests for evaluating whether an AI agent picks the right tool.
@@ -47,12 +49,73 @@ Write ${direct} "direct" requests and ${nearMiss} "near_miss" requests, each som
 - direct: clearly needs the target tool. Vary wording, length and specificity.
 - near_miss: needs the target tool, but is phrased so it superficially resembles one of the similar tools (shared words, similar intent). If there are no similar tools, make it ambiguous-sounding but still answerable only by the target.
 Rules: never mention any tool name; do not copy the description's wording; include concrete details (names, values) a user would give; each request must be answerable by the target tool and NOT better served by the similar tools.
-Return: {"direct": ["..."], "near_miss": ["..."]}`;
+Return a JSON object with exactly two keys: "direct" (an array of ${direct} request strings) and "near_miss" (an array of ${nearMiss} request strings). Every string must be a real, specific request, never a placeholder.`;
 }
 
-function clean(list: unknown): string[] {
-  if (!Array.isArray(list)) return [];
-  return list.filter((x): x is string => typeof x === "string").map((s) => s.trim()).filter((s) => s.length >= 8);
+// Quote and ellipsis characters, built from char codes so the source stays plain ASCII.
+const ELLIPSIS = String.fromCharCode(0x2026);
+const WRAPPERS: Array<[string, string]> = [
+  ['"', '"'],
+  ["'", "'"],
+  ["`", "`"],
+  [String.fromCharCode(0x201c), String.fromCharCode(0x201d)],
+  [String.fromCharCode(0x2018), String.fromCharCode(0x2019)],
+];
+const LEAD_DOTS = new RegExp(`^(\\.{2,}|${ELLIPSIS})\\s*`);
+const TRAIL_DOTS = new RegExp(`\\s*(\\.{3,}|${ELLIPSIS})$`);
+
+/**
+ * Strip the "..." and the quotes small models wrap around a whole request. A quote is removed
+ * only when it surrounds the entire prompt, so find 'user123' keeps its closing quote.
+ */
+export function tidy(s: string): string {
+  let t = s.trim();
+  for (let i = 0; i < 3; i++) {
+    const before = t;
+    t = t.replace(LEAD_DOTS, "").replace(TRAIL_DOTS, "").trim();
+    for (const [open, close] of WRAPPERS) {
+      if (t.length > 1 && t.startsWith(open) && t.endsWith(close)) t = t.slice(open.length, t.length - close.length).trim();
+    }
+    if (t === before) break;
+  }
+  return t;
+}
+
+/** True for non-requests like "...", "<request 1>" or "example request" that a model copied from the instructions. */
+export function isPlaceholder(s: string): boolean {
+  if (!/[a-z0-9]/i.test(s)) return true; // only punctuation, e.g. "..."
+  if (/^<[^>]*>$|^\[[^\]]*\]$|^\{[^}]*\}$/.test(s)) return true; // <request 1>, [your request]
+  return /^(example|sample|placeholder|request|prompt)( request| prompt)?( ?\d+)?$/i.test(s);
+}
+
+interface Cleaned {
+  items: string[];
+  /** how many entries were dropped as too short or as placeholders */
+  dropped: number;
+}
+
+function clean(list: unknown): Cleaned {
+  if (!Array.isArray(list)) return { items: [], dropped: 0 };
+  const all = list.filter((x): x is string => typeof x === "string").map(tidy);
+  const items = all.filter((s) => s.length >= 8 && !isPlaceholder(s));
+  return { items, dropped: all.length - items.length };
+}
+
+export interface Coverage {
+  tool: string;
+  total: number;
+  train: number;
+  validate: number;
+  test: number;
+}
+
+/** Prompt counts per tool (including tools with none), so gaps can't hide. */
+export function promptCoverage(prompts: TestPrompt[], tools: ToolInfo[]): Coverage[] {
+  return tools.map((t) => {
+    const mine = prompts.filter((p) => p.expected === t.name);
+    const n = (s: Split) => mine.filter((p) => p.split === s).length;
+    return { tool: t.name, total: mine.length, train: n("train"), validate: n("validate"), test: n("test") };
+  });
 }
 
 /** Assign train/validate/test per tool (stratified), 50/25/25. */
@@ -105,6 +168,7 @@ export async function generatePrompts(provider: Provider, tools: ToolInfo[], opt
         const text = await provider.complete(GEN_SYSTEM, genUser(tool, siblings, opts.perTool, opts.nearMiss), {
           temperature: 0.8,
           maxTokens: 2048,
+          json: true,
         });
         parsed = extractJson(text);
       } catch {
@@ -112,18 +176,37 @@ export async function generatePrompts(provider: Provider, tools: ToolInfo[], opt
       }
     }
     opts.onProgress?.(++done, tools.length);
-    if (!parsed) continue;
+    if (!parsed) {
+      opts.onWarn?.(`${tool.name}: the model did not return valid JSON after 2 tries, so this tool has no prompts.`);
+      continue;
+    }
+    const drop = { duplicate: 0, leak: 0, unusable: 0 };
+    let kept = 0;
 
     const add = (texts: string[], kind: TestPrompt["kind"]) => {
       for (const text of texts) {
         const key = text.toLowerCase();
-        if (seen.has(key) || leaksToolName(key, leakNames)) continue; // dedupe; drop prompts that name a tool
+        if (seen.has(key)) { drop.duplicate++; continue; } // dedupe
+        if (leaksToolName(key, leakNames)) { drop.leak++; continue; } // drop prompts that name a tool
         seen.add(key);
+        kept++;
         raw.push({ id: `${tool.name}#${hashString(key).toString(36)}`, text, expected: tool.name, kind });
       }
     };
-    add(clean(parsed.direct).slice(0, opts.perTool), "direct");
-    add(clean(parsed.near_miss ?? parsed.nearMiss).slice(0, opts.nearMiss), "near-miss");
+    const direct = clean(parsed.direct);
+    const near = clean(parsed.near_miss ?? parsed.nearMiss);
+    drop.unusable = direct.dropped + near.dropped;
+    add(direct.items.slice(0, opts.perTool), "direct");
+    add(near.items.slice(0, opts.nearMiss), "near-miss");
+    const wanted = opts.perTool + opts.nearMiss;
+    if (kept < wanted) {
+      const why = [
+        drop.unusable && `${drop.unusable} empty or placeholder`,
+        drop.duplicate && `${drop.duplicate} duplicate`,
+        drop.leak && `${drop.leak} named a tool`,
+      ].filter(Boolean).join(", ");
+      opts.onWarn?.(`${tool.name}: kept ${kept} of ${wanted} prompts${why ? ` (dropped: ${why})` : " (the model wrote fewer than asked)"}.`);
+    }
   }
   return assignSplits(raw, opts.seed);
 }

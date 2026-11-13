@@ -19,7 +19,7 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 ---
 
-> **Status: v0.0.2, pre-release.** 83 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run), but everything that talks to a model was tested against **fake OpenAI/Anthropic-compatible servers and a stand-in picker**. It has **not yet been run against live Anthropic, OpenAI, Gemini, Groq or Ollama endpoints**, and there are **no published before/after results on real MCP servers yet**. Please report what breaks.
+> **Status: v0.0.2, pre-release.** 100 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`).** The cloud providers (Anthropic, OpenAI, Gemini, Groq) have so far only been tested against fake API servers and have **not been run live**. There is **no published before/after improvement on a real MCP server yet**: our first live tune found no headroom to improve (see [Live results so far](#live-results-so-far)). Please report what breaks.
 
 ## Install
 
@@ -157,9 +157,27 @@ An MCP server is untrusted input, and so is whatever a model returns. Each item 
 
 Running a server command executes it with your privileges, as your MCP client would. See [SECURITY.md](SECURITY.md).
 
+## Live results so far
+
+What a real model did, so far. One local model, one deliberately badly described fixture server (`fixtures/confusing-server.ts`, 5 tools), CPU only.
+
+| Run | Result |
+|---|---|
+| `eval`, `qwen2.5:3b`, 38 hand-written prompts x 1 | **95% correct (36/38, 95% CI 83-99%)**, 0 API errors. Both misses were inside the confusable pairs `lint` flagged (`list_issues` vs `search_issues`, `get_user` vs `find_user`). For comparison, the offline keyword stand-in scored 39%. |
+| `tune`, picker and rewriter both `qwen2.5:3b`, 3 runs per prompt | **0 rewrites accepted.** Held-out accuracy was already 100% (30/30) before and after: there was no headroom, so no rewrite could be shown to help. 456 model calls, 42 minutes. |
+
+What we learned, and changed:
+
+- **No headroom is a real outcome.** With easy prompts a model already gets nearly everything right, and `tune` correctly accepted nothing. It now detects this up front and skips the rewrite work (it spent about 30 of those 42 minutes on rewrites that could not have been accepted).
+- **A 3B rewriter wrote wrong descriptions.** For example it told `search_issues` "Do not use for ... filtering by keyword; use list_issues", which inverts what that tool is for, and it told `find_user` "Do not use for actions like getting or listing issues". The gate rejected them (no gain), not because they were false. **The gate measures accuracy, not truth**, so read every accepted diff, and use a strong model as `--rewriter`.
+- **A 3B model is a poor prompt writer.** It copied the example placeholder from our instructions and returned `"..."` for every prompt, which we fixed, and it still mislabels some near-miss prompts. Use a stronger `--generator` than the model under test.
+
+We have not yet shown a rewrite improving accuracy on a real model. That needs prompts with genuine ambiguity or a real multi-tool server.
+
 ## Limits You Should Know
 
 - **Generated prompts are a proxy**, not your real users. Read `prompts.json`, delete the bad ones, and add prompts from real logs if you can.
+- **Use a stronger model to write prompts than the one you test.** In our first live run a 3B local model, asked to write test prompts, returned nothing usable for two tools and mislabeled some near-miss prompts (it wrote "list all issues" requests for the *search* tool). Toolright now warns per tool, prints prompts-per-tool, and refuses to evaluate a generated set that leaves a tool with fewer than 3 prompts. It cannot detect a mislabeled prompt, so read `prompts.json`.
 - **Small prompt sets are noisy and the gate is strict.** Use more prompts (`--per-tool`) and `--repeats`.
 - **Results differ by model.** A gain on a 3B local model is not a gain on a frontier model.
 - **Rewrites are model-written.** Read each accepted description; it must be true of the tool.
@@ -170,7 +188,8 @@ Running a server command executes it with your privileges, as your MCP client wo
 ## Roadmap
 
 - [ ] Run on 5-10 popular MCP servers and publish real before/after numbers
-- [ ] Verify against live Anthropic, OpenAI, Gemini, Groq and Ollama endpoints
+- [x] Verify Tier 2 live with Ollama
+- [ ] Verify the cloud providers live (Anthropic, OpenAI, Gemini, Groq)
 - [ ] GitHub Action with a PR comment showing the description diff
 - [ ] Ship Toolright itself as an MCP server (`audit_tools`)
 - [ ] Prompts mined from real agent logs
@@ -189,7 +208,7 @@ Issues and pull requests are welcome. Start with a failing test that shows the p
 
 ```bash
 npm install
-npm test          # 83 tests: unit, integration, security; no network or keys needed
+npm test          # 100 tests: unit, integration, security; no network or keys needed
 npm run typecheck
 npm run build
 ```

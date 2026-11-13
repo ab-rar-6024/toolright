@@ -39,6 +39,7 @@ export function tuneReport(r: TuneResult): string {
     "",
   );
   if (r.stoppedEarly) L.push(`> **Stopped early:** ${r.stoppedEarly}`, "");
+  if (r.note) L.push(`> **Note:** ${r.note}`, "");
   if (!r.finalMeasured) L.push("> **The \"after\" column is not measured with the new descriptions**, so ignore it. The budget ran out first.", "");
 
   L.push("## Accuracy on held-out test prompts", "", "| Model | Before | After |", "|---|---|---|");
@@ -50,7 +51,7 @@ export function tuneReport(r: TuneResult): string {
   }
 
   L.push("", `## Rewrites (${accepted.length} accepted, ${r.rewrites.length - accepted.length} rejected)`, "");
-  if (r.rewrites.length === 0) L.push("No weak tools found, so nothing was rewritten.");
+  if (r.rewrites.length === 0) L.push(r.note ? "No rewrites were tried (see the note above)." : "No weak tools found, so nothing was rewritten.");
   for (const w of r.rewrites) {
     L.push(`### ${w.accepted ? "Accepted" : "Rejected"}: \`${w.tool}\``, "");
     L.push(`- Before: ${w.before || "(empty)"}`, `- After: ${w.after || "(empty)"}`);
@@ -82,6 +83,7 @@ export function tuneJson(r: TuneResult) {
     repeats: r.repeats,
     finalMeasured: r.finalMeasured,
     stoppedEarly: r.stoppedEarly ?? null,
+    note: r.note ?? null,
     test: r.baseline.map((base) => ({
       model: base.model,
       before: summarize(filterItems(base, testIds)),

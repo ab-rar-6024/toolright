@@ -159,6 +159,33 @@ describe("tune loop (machinery test with the heuristic stand-in, not a model)", 
     expect(r.rewrites.every((w) => !w.accepted)).toBe(true);
   });
 
+  it("skips all rewrite work when validation accuracy is already 100% (no headroom)", async () => {
+    // Fails only on training prompts, so tools look "weak" on train while validation is perfect.
+    const splitOf = new Map(prompts.map((p) => [p.text, p.split]));
+    const expectedOf = new Map(prompts.map((p) => [p.text, p.expected]));
+    let picks = 0;
+    let rewrites = 0;
+    const picker: Provider = {
+      id: "train-failer", local: true, complete: async () => "",
+      pick: async (_t, text) => {
+        picks++;
+        const right = expectedOf.get(text)!;
+        return { tool: splitOf.get(text) === "train" ? tools.find((x) => x.name !== right)!.name : right };
+      },
+    };
+    const rewriter: Provider = { id: "rw", local: true, pick: async () => ({ tool: null }), complete: async () => { rewrites++; return JSON.stringify({ description: "A perfectly fine long enough description." }); } };
+    const budget = new Budget(100_000);
+    const r = await tune({ tools, prompts, providers: [picker], rewriter, evalOpts: { repeats: 2, concurrency: 1, seed: 1, budget }, maxRewrites: 5, weakThreshold: 0.95 });
+    expect(rewrites).toBe(0);
+    expect(r.rewrites).toHaveLength(0);
+    expect(r.note).toMatch(/No headroom/);
+    expect(budget.calls).toBe(picks);
+    expect(picks).toBe(prompts.length * 2); // the baseline only: no candidate was evaluated
+    const md = tuneReport(r);
+    expect(md).toContain("No headroom");
+    expect(md).not.toContain("No weak tools found");
+  });
+
   it("never lets the rewriter see validation or test prompts", async () => {
     const seen: string[] = [];
     const spy: Provider = {

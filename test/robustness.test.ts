@@ -236,7 +236,7 @@ describe("streamable HTTP transport", () => {
   }, 30_000);
 });
 
-describe("CLI robustness", () => {
+describe("CLI robustness", { timeout: 60_000 }, () => {
   const cli = (args: string[], env: Record<string, string> = {}) =>
     spawnSync(process.execPath, ["--import", "tsx", "src/cli.ts", ...args], { encoding: "utf8", env: { ...process.env, ...env }, timeout: 60_000 });
   const base = ["eval", "--tools", "fixtures/confusing-tools.json", "-m", "heuristic", "--prompts", "fixtures/prompts.json"];

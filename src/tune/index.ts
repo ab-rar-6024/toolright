@@ -50,6 +50,8 @@ export interface TuneResult {
   /** false if the budget ran out before the test split could be re-run with the new descriptions */
   finalMeasured: boolean;
   stoppedEarly?: string;
+  /** why the loop ended without trying (more) rewrites, when that is not an error */
+  note?: string;
 }
 
 const ids = (ps: TestPrompt[]) => new Set(ps.map((p) => p.id));
@@ -144,7 +146,19 @@ export async function tune(o: TuneOptions): Promise<TuneResult> {
   const weak = weakTools(baseline, trainIds, o.weakThreshold, o.tools).slice(0, o.maxRewrites);
   log(weak.length ? `weak tools: ${weak.join(", ")}` : "no weak tools found on the training split");
 
+  let note: string | undefined;
+  const gateSet = validate.length > 0 ? valIds : trainIds;
+  const gateLabel = validate.length > 0 ? "validation" : "training";
+
   for (const name of weak) {
+    // A candidate is only accepted if it beats the current accuracy. At 100% nothing can, so
+    // every rewrite and evaluation from here on would be wasted (this cost ~30 minutes on a local model).
+    if (meanAccuracy(currentTV, gateSet) >= 1 - 1e-9) {
+      note = rewrites.length === 0
+        ? `No headroom: accuracy on the ${gateLabel} prompts is already 100%, so no rewrite could be shown to improve it. No rewrites were tried. Use harder prompts (more near-miss cases) or a server with genuinely ambiguous tools.`
+        : `Stopped trying rewrites: accuracy on the ${gateLabel} prompts reached 100%, so no further rewrite could be shown to improve it.`;
+      break;
+    }
     if (budget && budget.calls + candCost + finalCost > budget.max) {
       stoppedEarly = "call budget reached before all candidates were tried";
       break;
@@ -243,5 +257,6 @@ export async function tune(o: TuneOptions): Promise<TuneResult> {
     finalTools: current,
     finalMeasured,
     stoppedEarly,
+    note,
   };
 }

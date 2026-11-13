@@ -15,7 +15,7 @@ export interface Provider {
   /** Ask the model which tool it would call. The call is never executed. */
   pick(tools: ToolInfo[], prompt: string): Promise<Pick>;
   /** Plain completion, used for prompt generation and description rewriting. */
-  complete(system: string, user: string, opts?: { temperature?: number; maxTokens?: number }): Promise<string>;
+  complete(system: string, user: string, opts?: { temperature?: number; maxTokens?: number; json?: boolean }): Promise<string>;
 }
 
 export const PICK_SYSTEM =

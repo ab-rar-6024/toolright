@@ -6,7 +6,7 @@ import { Command, InvalidArgumentError } from "commander";
 import { attachBranding } from "./brand.js";
 import { VERSION } from "./version.js";
 import { Budget, BudgetExceeded, estimateTokensPerCall, evaluate } from "./eval/run.js";
-import { generatePrompts, loadPrompts, savePrompts, type TestPrompt } from "./gen/prompts.js";
+import { generatePrompts, loadPrompts, promptCoverage, savePrompts, type TestPrompt } from "./gen/prompts.js";
 import { exitCode, formatLint, lint } from "./lint/index.js";
 import { siblingMap, type SimilarityMethod } from "./lint/overlap.js";
 import type { Severity } from "./lint/structure.js";
@@ -139,7 +139,25 @@ withServer(
 });
 
 // ---------- prompt generation helper ----------
-async function generate(gen: Provider, tools: ToolInfo[], opts: { perTool: number; nearMiss: number; seed: number }): Promise<TestPrompt[]> {
+/** A tool needs at least this many generated prompts for a run to mean anything. */
+const MIN_PROMPTS_PER_TOOL = 3;
+
+function thinTools(prompts: TestPrompt[], tools: ToolInfo[]): string[] {
+  return promptCoverage(prompts, tools)
+    .filter((c) => c.total < MIN_PROMPTS_PER_TOOL)
+    .map((c) => `${c.tool} (${c.total})`);
+}
+
+/**
+ * Generate prompts with a model. With `strict`, refuse to continue when some tool is left with
+ * almost no prompts: scoring a run on a set with holes gives numbers that look real and aren't.
+ */
+async function generate(
+  gen: Provider,
+  tools: ToolInfo[],
+  opts: { perTool: number; nearMiss: number; seed: number },
+  strict: boolean,
+): Promise<TestPrompt[]> {
   const lintRes = await lint(tools);
   const prompts = await generatePrompts(gen, tools, {
     perTool: opts.perTool,
@@ -147,11 +165,25 @@ async function generate(gen: Provider, tools: ToolInfo[], opts: { perTool: numbe
     seed: opts.seed,
     siblings: siblingMap(lintRes.pairs),
     onProgress: (d, t) => log(`generated prompts for ${d}/${t} tools`),
+    onWarn: (m) => log(`warning: ${m}`),
   });
+  const thin = thinTools(prompts, tools);
+  log(`Prompts per tool: ${promptCoverage(prompts, tools).map((c) => `${c.tool}=${c.total}`).join(", ")}`);
+  if (thin.length > 0) {
+    const msg = `Generation left these tools with fewer than ${MIN_PROMPTS_PER_TOOL} prompts: ${thin.join(", ")}. Small models often fail at this and sometimes mislabel near-miss prompts. Use a stronger --generator, or run "toolright gen", fix prompts.json by hand, and pass --prompts.`;
+    if (strict) throw new Error(msg);
+    log(`warning: ${msg}`);
+  }
   if (prompts.length === 0) {
     throw new Error(`${gen.id} produced no usable prompts. Check the model can follow JSON instructions, or write a prompts file by hand.`);
   }
   return prompts;
+}
+
+/** Tools with no prompts are silently unmeasured otherwise. */
+function warnUncovered(prompts: TestPrompt[], tools: ToolInfo[]): void {
+  const none = promptCoverage(prompts, tools).filter((c) => c.total === 0).map((c) => c.tool);
+  if (none.length > 0) log(`warning: no prompts for ${none.join(", ")}. These tools are not evaluated and will not be rewritten.`);
 }
 
 // ---------- gen ----------
@@ -171,7 +203,7 @@ withServer(
   const gen = createProvider(opts.generator);
   await confirmCost([gen], tools.length, tools, !!opts.yes);
   await preflight([], gen, tools, new Budget());
-  const prompts = await generate(gen, tools, opts);
+  const prompts = await generate(gen, tools, opts, false);
   await savePrompts(opts.out, tools, prompts);
   console.log(`Wrote ${prompts.length} prompts to ${opts.out}. Read them before trusting any score: edit or delete bad ones.`);
 });
@@ -224,9 +256,10 @@ evalOptions(withServer(program.command("eval").description("Measure how often ea
     await preflight(providers, generator, tools, budget);
     if (!prompts && generator) {
       log(`Generating prompts with ${generator.id}`);
-      prompts = await generate(generator, tools, opts);
+      prompts = await generate(generator, tools, opts, true);
     }
     const finalPrompts = prompts!;
+  warnUncovered(finalPrompts, tools);
 
     const results = [];
     try {
@@ -281,9 +314,10 @@ evalOptions(
   await preflight(providers, rewriter, tools, budget);
   if (!prompts && generator) {
     log(`Generating prompts with ${generator.id}`);
-    prompts = await generate(generator, tools, opts);
+    prompts = await generate(generator, tools, opts, true);
   }
   const finalPrompts = prompts!;
+  warnUncovered(finalPrompts, tools);
 
   const concurrency = opts.concurrency ?? (providers.every((p) => p.local) ? 1 : 4);
   const result = await tune({

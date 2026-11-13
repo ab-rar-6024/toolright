@@ -26,9 +26,16 @@ export function openaiProvider(o: OpenAIOptions): Provider {
     try {
       return await postJson(`${base}/chat/completions`, headers, withTemp);
     } catch (e) {
-      // some newer models only accept the default temperature
-      if (temperature !== undefined && e instanceof HttpError && e.status === 400 && /temperature/i.test(e.body)) {
-        return postJson(`${base}/chat/completions`, headers, body);
+      if (e instanceof HttpError && e.status === 400) {
+        // some servers don't support JSON mode: retry without it
+        if ("response_format" in body && /response_format|json_object|json mode/i.test(e.body)) {
+          const { response_format: _dropped, ...rest } = body;
+          return chat(rest, temperature);
+        }
+        // some newer models only accept the default temperature
+        if (temperature !== undefined && /temperature/i.test(e.body)) {
+          return postJson(`${base}/chat/completions`, headers, body);
+        }
       }
       throw e;
     }
@@ -78,6 +85,7 @@ export function openaiProvider(o: OpenAIOptions): Provider {
               { role: "user", content: user },
             ],
             ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
+            ...(opts.json ? { response_format: { type: "json_object" } } : {}),
           },
           opts.temperature ?? 0.7,
         );
