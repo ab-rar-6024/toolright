@@ -16,6 +16,11 @@
   <br />
   <br />
 
+  <img src="assets/demo.svg" alt="Toolright Demo" width="100%" />
+
+  <br />
+  <br />
+
   <a href="#quick-start"><strong>Quick Start</strong></a> &nbsp;&middot;&nbsp;
   <a href="#why-toolright"><strong>Why Toolright?</strong></a> &nbsp;&middot;&nbsp;
   <a href="#live-results-so-far"><strong>Live Results</strong></a> &nbsp;&middot;&nbsp;

@@ -1,0 +1,77 @@
+<svg fill="none" viewBox="0 0 850 480" width="850" height="480" xmlns="http://www.w3.org/2000/svg">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <style>
+        .terminal {
+          background-color: #0d1117;
+          border: 1px solid #30363d;
+          border-radius: 10px;
+          padding: 20px;
+          font-family: 'Fira Code', 'Cascadia Code', Consolas, Monaco, monospace;
+          color: #c9d1d9;
+          font-size: 13.5px;
+          line-height: 1.5;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+          box-sizing: border-box;
+          height: 480px;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 15px;
+        }
+        .dots {
+          display: flex;
+          gap: 6px;
+        }
+        .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+        }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+        .title {
+          margin-left: auto;
+          margin-right: auto;
+          color: #8b949e;
+          font-size: 12px;
+        }
+        .cmd { color: #58a6ff; font-weight: bold; }
+        .dim { color: #8b949e; }
+        .warn { color: #d29922; font-weight: bold; }
+        .bold { color: #f0f6fc; font-weight: bold; }
+        .cyan { color: #39c5cf; }
+        .green-txt { color: #3fb950; }
+        .magenta { color: #bc8cff; }
+      </style>
+      <div class="terminal">
+        <div class="header">
+          <div class="dots">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+          </div>
+          <div class="title">bash — toolright lint &amp; tune</div>
+        </div>
+        <div><span class="dim">$</span> <span class="cmd">npx toolright lint</span> <span class="dim">--tools fixtures/company-tools.json</span></div>
+        <div class="dim">8 tools checked (similarity: lexical, threshold 0.45)</div>
+        <br/>
+        <div class="bold">Confusable pairs (most likely cause of wrong picks):</div>
+        <div>  <span class="warn">warn</span>  <span class="bold">find_customer</span> and <span class="bold">lookup_customer</span> look similar (62%) <span class="dim">— nothing tells the agent when to use which</span></div>
+        <div>  <span class="warn">warn</span>  <span class="bold">close_item</span> and <span class="bold">resolve_item</span> look similar (54%) <span class="dim">— nothing tells the agent when to use which</span></div>
+        <div>  <span class="warn">warn</span>  <span class="bold">remove_member</span> and <span class="bold">deactivate_member</span> look similar (51%) <span class="dim">— nothing tells the agent when to use which</span></div>
+        <br/>
+        <div><span class="dim">$</span> <span class="cmd">npx toolright tune</span> <span class="dim">--tools server.json --rewriter groq:llama-3.3-70b</span></div>
+        <div class="dim">Plan: 64 prompts across 8 tools. Held-out test split gating enabled.</div>
+        <div class="cyan">baseline: 84% accuracy (27/32 on test split)</div>
+        <div class="green-txt">✓ candidate find_customer: validation accuracy 88% -> 91% (accepted)</div>
+        <div class="green-txt">✓ candidate lookup_customer: validation accuracy 91% -> 97% (accepted)</div>
+        <div class="magenta">final held-out test accuracy: 84% -> 91% (+7% improvement, 0 regressions)</div>
+        <br/>
+        <div class="green-txt">✔ Saved report.md, report.html, and descriptions.diff</div>
+      </div>
+    </div>
+  </foreignObject>
+</svg>
