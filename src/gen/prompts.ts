@@ -217,7 +217,8 @@ export async function savePrompts(path: string, tools: ToolInfo[], prompts: Test
 }
 
 export async function loadPrompts(path: string, tools: ToolInfo[], seed = 1): Promise<TestPrompt[]> {
-  const parsed = JSON.parse(await readFile(path, "utf8"));
+  const text = (await readFile(path, "utf8")).replace(/^\uFEFF/, "");
+  const parsed = JSON.parse(text);
   const list: any[] = Array.isArray(parsed) ? parsed : parsed.prompts;
   if (!Array.isArray(list)) throw new Error(`${path}: expected {"prompts": [...]}`);
   const names = new Set(tools.map((t) => t.name));

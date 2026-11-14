@@ -37,6 +37,30 @@ describe("company fixture (synthetic, ambiguous tool pairs)", () => {
     expect(new Set(prompts.map((p) => p.text)).size).toBe(64); // no duplicates
   });
 
+  it("handles files with leading UTF-8 BOM smoothly", async () => {
+    const { mkdtemp, writeFile, rm } = await import("node:fs/promises");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const dir = await mkdtemp(join(tmpdir(), "bom-test-"));
+    try {
+      const toolFile = join(dir, "tools.json");
+      const promptFile = join(dir, "prompts.json");
+      // Prepend UTF-8 BOM (\uFEFF)
+      await writeFile(toolFile, "\uFEFF" + JSON.stringify([{ name: "t1", description: "test tool 1" }]), "utf8");
+      await writeFile(promptFile, "\uFEFF" + JSON.stringify({ prompts: [{ id: "1", text: "hi", expected: "t1" }] }), "utf8");
+
+      const loaded = await loadTools({ toolsFile: toolFile });
+      expect(loaded).toHaveLength(1);
+      expect(loaded[0]!.name).toBe("t1");
+
+      const prompts = await loadPrompts(promptFile, loaded);
+      expect(prompts).toHaveLength(1);
+      expect(prompts[0]!.expected).toBe("t1");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("no prompt names a tool (that would hand the model the answer)", () => {
     const names = (JSON.parse(readFileSync("fixtures/company-tools.json", "utf8")) as Array<{ name: string }>).map((t) => t.name);
     const prompts = (JSON.parse(readFileSync("fixtures/company-prompts.json", "utf8")) as { prompts: Array<{ text: string }> }).prompts;

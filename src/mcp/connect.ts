@@ -104,7 +104,8 @@ export interface ToolSource {
 export async function loadTools(src: ToolSource): Promise<ToolInfo[]> {
   const opts: LoadOptions = { timeoutMs: src.timeoutMs, maxTools: src.maxTools };
   if (src.toolsFile) {
-    const raw = JSON.parse(await readFile(src.toolsFile, "utf8"));
+    const text = (await readFile(src.toolsFile, "utf8")).replace(/^\uFEFF/, "");
+    const raw = JSON.parse(text);
     const arr = Array.isArray(raw) ? raw : raw?.tools;
     if (!Array.isArray(arr)) throw new Error(`${src.toolsFile}: expected an array of tools`);
     if (arr.length > (opts.maxTools ?? LIMITS.maxTools)) throw new Error(`${src.toolsFile}: too many tools (more than ${opts.maxTools ?? LIMITS.maxTools})`);
