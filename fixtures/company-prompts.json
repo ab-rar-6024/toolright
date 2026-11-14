@@ -1,0 +1,399 @@
+{
+  "version": 1,
+  "toolNames": [
+    "close_item",
+    "resolve_item",
+    "remove_member",
+    "deactivate_member",
+    "find_customer",
+    "lookup_customer",
+    "send_alert",
+    "send_notice"
+  ],
+  "prompts": [
+    {
+      "id": "close_item#0",
+      "text": "We decided not to build this feature request, shut it down.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#1",
+      "text": "This ticket is a duplicate of one we already have, close it out.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#2",
+      "text": "That bug report is obsolete since we dropped the product, close it.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#3",
+      "text": "Out of scope for this quarter, so close the item without doing the work.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#4",
+      "text": "Nobody is going to fix this old issue, close it as won't fix.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#5",
+      "text": "Close the stale request, the customer never replied and we're abandoning it.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#6",
+      "text": "This idea got rejected in review, so close the item.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "close_item#7",
+      "text": "The task was cancelled by management, close it, no work was done.",
+      "expected": "close_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#0",
+      "text": "The login bug was fixed in the latest release, mark it as resolved.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#1",
+      "text": "We shipped the dark mode feature yesterday, mark that item as done.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#2",
+      "text": "The patch for the crash is merged and deployed, so resolve the ticket.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#3",
+      "text": "I finished the migration work for item 5521, mark it resolved.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#4",
+      "text": "The customer confirmed our fix worked, resolve the issue.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#5",
+      "text": "Fix is live in production now; set the bug to resolved.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#6",
+      "text": "All the work on this task is complete, mark it completed.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "resolve_item#7",
+      "text": "We corrected the typo on the pricing page, resolve that item.",
+      "expected": "resolve_item",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#0",
+      "text": "Delete the account of the spam user permanently, wipe their data.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#1",
+      "text": "This person requested deletion of all their data under GDPR, remove them completely.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#2",
+      "text": "Erase the test member accounts we created, we don't need them at all.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#3",
+      "text": "Remove this member for good, including everything they ever posted.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#4",
+      "text": "That bot account should be wiped from the system entirely.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#5",
+      "text": "Permanently delete Alex's membership, there's no coming back.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#6",
+      "text": "Purge the fake signups from the member list completely.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "remove_member#7",
+      "text": "Remove the duplicate account and erase its history.",
+      "expected": "remove_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#0",
+      "text": "Sam is going on a long leave, turn off their access for now but keep their data.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#1",
+      "text": "Suspend this member's login while we investigate, we may reinstate them.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#2",
+      "text": "Lock out the contractor whose contract ended, but keep their records.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#3",
+      "text": "Disable Priya's account temporarily, she'll be back in March.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#4",
+      "text": "Pause this member's access; don't delete anything.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#5",
+      "text": "Block the member from signing in until they pay the overdue invoice.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#6",
+      "text": "Deactivate the employee who left, we have to retain their history for audit.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "deactivate_member#7",
+      "text": "Put the member on hold so they can't log in; reversible please.",
+      "expected": "deactivate_member",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#0",
+      "text": "Who is the customer named Maria Gonzalez?",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#1",
+      "text": "Search for customers with the email domain acme.com.",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#2",
+      "text": "Find anyone called Chen in our customer base.",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#3",
+      "text": "I only remember her first name was Olivia and she is from Toronto, find her.",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#4",
+      "text": "Look for customers whose company name contains Globex.",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#5",
+      "text": "Is there a customer with the phone number ending in 4417?",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#6",
+      "text": "Find the customer who emailed from jo.martin@example.org.",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "find_customer#7",
+      "text": "Which customers are named Patel?",
+      "expected": "find_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#0",
+      "text": "Pull up customer C-1042.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#1",
+      "text": "Get the full record for customer ID 88213.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#2",
+      "text": "Show me the account details of customer number 5530.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#3",
+      "text": "Open customer CUST-7781.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#4",
+      "text": "I have the ID, 90417, give me that customer's record.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#5",
+      "text": "Fetch customer C-20991's billing details.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#6",
+      "text": "What plan is customer 3141 on? Look up by ID.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "lookup_customer#7",
+      "text": "Display the profile for customer id KX-5521.",
+      "expected": "lookup_customer",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#0",
+      "text": "Production is down, page the on-call engineer right now.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#1",
+      "text": "The database is on fire, wake someone up immediately.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#2",
+      "text": "Site latency is through the roof, alert on-call now.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#3",
+      "text": "Payments are failing for everyone, this is an emergency, get the engineers paged.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#4",
+      "text": "Security breach suspected, notify the incident responders urgently.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#5",
+      "text": "Disk is 99% full on the primary server, raise the alarm.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#6",
+      "text": "Our checkout API is returning 500s, sound the alarm for the on-call team.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_alert#7",
+      "text": "Critical outage in the EU region, escalate to on-call immediately.",
+      "expected": "send_alert",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#0",
+      "text": "Let everyone know the all-hands moves to 3pm on Thursday.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#1",
+      "text": "Announce that the office will be closed next Monday for the holiday.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#2",
+      "text": "Post a heads-up that the wiki will be read-only this weekend for maintenance.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#3",
+      "text": "Send a friendly reminder that timesheets are due Friday.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#4",
+      "text": "Tell the team the new coffee machine is installed in the kitchen.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#5",
+      "text": "Share the news that our Q3 newsletter is out.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#6",
+      "text": "Remind people the parking lot is being repainted next week, no rush.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    },
+    {
+      "id": "send_notice#7",
+      "text": "Notify staff that the benefits enrollment window opens next month.",
+      "expected": "send_notice",
+      "kind": "near-miss"
+    }
+  ]
+}
