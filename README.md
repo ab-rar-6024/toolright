@@ -167,11 +167,13 @@ What a real model did, so far. One local model (`qwen2.5:3b`), CPU only, tested 
 | `tune`, picker & rewriter `qwen2.5:3b`, 3 runs per prompt | `fixtures/confusing-server.ts` (5 tools) | **0 rewrites accepted.** Held-out accuracy was already 100% (30/30) before and after: there was no headroom, so no rewrite could be shown to help. 456 model calls, 42 minutes. |
 | `tune`, picker & rewriter `qwen2.5:3b`, 2 runs per prompt | `fixtures/company-server.ts` (8 tools in 4 confusable pairs) | **2 rewrites accepted, accuracy improved from 84% (27/32) to 91% (29/32, 95% CI 76-97%) on held-out test prompts.** Validation accuracy gained on `find_customer` (88% -> 91%) and `lookup_customer` (91% -> 97%). 2 candidates rejected (`remove_member`, `deactivate_member`). 550 model calls, 64 minutes. |
 | `eval`, `groq:openai/gpt-oss-120b`, 64 prompts x 1 | `fixtures/company-server.ts` (8 tools in 4 confusable pairs) | **96% correct (49/51, 95% CI 87-99%)** via Groq cloud API. Correctly resolved 6 out of 8 tools with 100% accuracy. Misses were confusions between `resolve_item` vs `close_item` and `deactivate_member` vs `find_customer`. |
+| `eval` & `tune`, `groq:openai/gpt-oss-120b`, 84 prompts | `@modelcontextprotocol/server-filesystem` (official 14 tools) | Baseline accuracy **60% (12/20)** on held-out test prompts with severe confusion on `read_file` vs `read_text_file`. A rewrite candidate for `read_text_file` improved validation accuracy (76% -> 78%) but was **rejected by the non-regression safety gate** because it caused regressions on `write_file`. Proves the gating safety mechanism protects real servers. |
 
 What we learned, and changed:
 
 - **No headroom is a real outcome.** With easy prompts a model already gets nearly everything right, and `tune` correctly accepted nothing. It now detects this up front and skips the rewrite work (it spent about 30 of those 42 minutes on rewrites that could not have been accepted).
 - **Harder ambiguous tool sets show measurable gains.** On `company-server.ts`, disambiguating ID lookup vs query search moved test accuracy up +7% without regressing other tools.
+- **The non-regression gate protects against subtle side-effects.** On the real filesystem MCP server, candidate rewrites that increased validation accuracy overall were correctly rejected when they regressed neighboring tools like `write_file`.
 - **A 3B rewriter wrote wrong descriptions.** For example it told `search_issues` "Do not use for ... filtering by keyword; use list_issues", which inverts what that tool is for, and it told `find_user` "Do not use for actions like getting or listing issues". The gate rejected them (no gain), not because they were false. **The gate measures accuracy, not truth**, so read every accepted diff, and use a strong model as `--rewriter`.
 - **A 3B model is a poor prompt writer.** It copied the example placeholder from our instructions and returned `"..."` for every prompt, which we fixed, and it still mislabels some near-miss prompts. Use a stronger `--generator` than the model under test.
 
@@ -190,9 +192,9 @@ While synthetic fixtures prove the tune loop works end-to-end, published results
 
 ## Roadmap
 
-- [ ] Run on 5-10 popular MCP servers and publish real before/after numbers
+- [ ] Run on 5-10 popular MCP servers and publish real before/after numbers (started: `@modelcontextprotocol/server-filesystem` tested)
 - [x] Verify Tier 2 live with Ollama
-- [ ] Verify the cloud providers live (Anthropic, OpenAI, Gemini, Groq)
+- [x] Verify Tier 3 cloud providers live (verified with Groq)
 - [ ] GitHub Action with a PR comment showing the description diff
 - [ ] Ship Toolright itself as an MCP server (`audit_tools`)
 - [ ] Prompts mined from real agent logs
@@ -211,7 +213,7 @@ Issues and pull requests are welcome. Start with a failing test that shows the p
 
 ```bash
 npm install
-npm test          # 100 tests: unit, integration, security; no network or keys needed
+npm test          # 105 tests: unit, integration, security; no network or keys needed
 npm run typecheck
 npm run build
 ```
