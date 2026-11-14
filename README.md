@@ -19,7 +19,7 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 ---
 
-> **Status: v0.0.2, pre-release.** 104 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`).** The cloud providers (Anthropic, OpenAI, Gemini, Groq) have so far only been tested against fake API servers and have **not been run live**. First live tune results on a synthetic stress-test server (`fixtures/company-server.ts`) demonstrated a measured gain from **84% to 91%** accuracy on held-out test prompts (see [Live results so far](#live-results-so-far)). Please report what breaks.
+> **Status: v0.0.2, pre-release.** 104 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** First live tune results on a synthetic stress-test server (`fixtures/company-server.ts`) demonstrated a measured gain from **84% to 91%** accuracy on held-out test prompts (see [Live results so far](#live-results-so-far)). Please report what breaks.
 
 ## Install
 
@@ -166,6 +166,7 @@ What a real model did, so far. One local model (`qwen2.5:3b`), CPU only, tested 
 | `eval`, `qwen2.5:3b`, 38 hand-written prompts x 1 | `fixtures/confusing-server.ts` (5 tools) | **95% correct (36/38, 95% CI 83-99%)**, 0 API errors. Both misses were inside the confusable pairs `lint` flagged (`list_issues` vs `search_issues`, `get_user` vs `find_user`). For comparison, the offline keyword stand-in scored 39%. |
 | `tune`, picker & rewriter `qwen2.5:3b`, 3 runs per prompt | `fixtures/confusing-server.ts` (5 tools) | **0 rewrites accepted.** Held-out accuracy was already 100% (30/30) before and after: there was no headroom, so no rewrite could be shown to help. 456 model calls, 42 minutes. |
 | `tune`, picker & rewriter `qwen2.5:3b`, 2 runs per prompt | `fixtures/company-server.ts` (8 tools in 4 confusable pairs) | **2 rewrites accepted, accuracy improved from 84% (27/32) to 91% (29/32, 95% CI 76-97%) on held-out test prompts.** Validation accuracy gained on `find_customer` (88% -> 91%) and `lookup_customer` (91% -> 97%). 2 candidates rejected (`remove_member`, `deactivate_member`). 550 model calls, 64 minutes. |
+| `eval`, `groq:openai/gpt-oss-120b`, 64 prompts x 1 | `fixtures/company-server.ts` (8 tools in 4 confusable pairs) | **96% correct (49/51, 95% CI 87-99%)** via Groq cloud API. Correctly resolved 6 out of 8 tools with 100% accuracy. Misses were confusions between `resolve_item` vs `close_item` and `deactivate_member` vs `find_customer`. |
 
 What we learned, and changed:
 
