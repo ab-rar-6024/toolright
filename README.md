@@ -9,7 +9,7 @@
   <a href="https://www.npmjs.com/package/toolright"><img src="https://img.shields.io/npm/v/toolright?style=flat-square&label=npm&color=2563eb" alt="npm version" /></a>
   <a href="https://pypi.org/project/toolright/"><img src="https://img.shields.io/pypi/v/toolright?style=flat-square&label=pypi&color=3b82f6" alt="PyPI version" /></a>
   <a href="https://github.com/ab-rar-6024/toolright/actions"><img src="https://img.shields.io/github/actions/workflow/status/ab-rar-6024/toolright/ci.yml?style=flat-square&label=ci" alt="CI status" /></a>
-  <a href="https://github.com/ab-rar-6024/toolright"><img src="https://img.shields.io/badge/tests-111%20passed-success?style=flat-square" alt="Tests" /></a>
+  <a href="https://github.com/ab-rar-6024/toolright"><img src="https://img.shields.io/badge/tests-112%20passed-success?style=flat-square" alt="Tests" /></a>
   <a href="https://github.com/ab-rar-6024/toolright/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" /></a>
   <a href="https://github.com/ab-rar-6024/toolright"><img src="https://img.shields.io/github/stars/ab-rar-6024/toolright?style=flat-square&color=eab308" alt="GitHub stars" /></a>
 
@@ -34,7 +34,7 @@
 
 ---
 
-> **Status: v0.0.3, pre-release.** 111 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end-to-end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** Disambiguation tuning on synthetic and real servers demonstrates measured accuracy improvements on held-out test splits (see [Live results so far](#live-results-so-far)).
+> **Status: v0.0.3, pre-release.** 112 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end-to-end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** Disambiguation tuning on synthetic and real servers demonstrates measured accuracy improvements on held-out test splits (see [Live results so far](#live-results-so-far)).
 
 ---
 
@@ -260,7 +260,8 @@ See [SECURITY.md](SECURITY.md) for details.
 - [x] Ship Toolright itself as an MCP server (`toolright serve` with `lint_tools`)
 - [x] Prompts mined from real agent logs (`toolright ingest-logs`)
 - [x] Standalone visual HTML reports (`report.html` and `eval.html`)
-- [ ] PyPI automated release workflows on git tag push
+- [x] PyPI and npm automated release workflows on git release (`.github/workflows/release.yml`)
+- [x] Negative control evaluation (measuring whether models trigger tools on non-tool conversational prompts)
 
 ---
 
@@ -272,7 +273,7 @@ We welcome contributions of all kinds! Start by running the test suite:
 git clone https://github.com/ab-rar-6024/toolright.git
 cd toolright
 npm install
-npm test          # 111 tests pass: unit, integration, security; no keys needed
+npm test          # 112 tests pass: unit, integration, security; no keys needed
 npm run typecheck
 npm run build
 ```

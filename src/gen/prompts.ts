@@ -4,6 +4,7 @@ import type { Provider } from "../providers/types.js";
 import { extractJson, hashString, mulberry32, schemaProps, shuffle, tokenize } from "../util.js";
 
 export type Split = "train" | "validate" | "test";
+export const NONE_TOOL = "__none__";
 
 export interface TestPrompt {
   id: string;
@@ -221,14 +222,15 @@ export async function loadPrompts(path: string, tools: ToolInfo[], seed = 1): Pr
   const parsed = JSON.parse(text);
   const list: any[] = Array.isArray(parsed) ? parsed : parsed.prompts;
   if (!Array.isArray(list)) throw new Error(`${path}: expected {"prompts": [...]}`);
-  const names = new Set(tools.map((t) => t.name));
+  const names = new Set([...tools.map((t) => t.name), NONE_TOOL, "none"]);
   const base = list.map((p, i) => {
     if (typeof p.text !== "string" || typeof p.expected !== "string") throw new Error(`${path}: prompt ${i} needs "text" and "expected"`);
     if (!names.has(p.expected)) throw new Error(`${path}: prompt ${i} expects unknown tool "${p.expected}"`);
+    const expected = p.expected === "none" ? NONE_TOOL : p.expected;
     return {
-      id: String(p.id ?? `${p.expected}#${hashString(p.text).toString(36)}`),
+      id: String(p.id ?? `${expected}#${hashString(p.text).toString(36)}`),
       text: p.text as string,
-      expected: p.expected as string,
+      expected,
       kind: (p.kind === "near-miss" ? "near-miss" : "direct") as TestPrompt["kind"],
       split: p.split as Split | undefined,
     };

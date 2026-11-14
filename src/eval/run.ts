@@ -78,11 +78,14 @@ export async function evaluate(
     } else {
       consecutiveErrors = 0;
     }
+    const correct = !res.error && (
+      (p.expected === "__none__" || p.expected === "none") ? res.tool === null : res.tool === p.expected
+    );
     return {
       promptId: p.id,
       expected: p.expected,
       picked: res.tool,
-      correct: !res.error && res.tool === p.expected,
+      correct,
       repeat: r,
       ...(res.error ? { error: res.error } : {}),
     };
