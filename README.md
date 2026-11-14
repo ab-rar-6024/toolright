@@ -19,7 +19,7 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 ---
 
-> **Status: v0.0.2, pre-release.** 104 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** First live tune results on a synthetic stress-test server (`fixtures/company-server.ts`) demonstrated a measured gain from **84% to 91%** accuracy on held-out test prompts (see [Live results so far](#live-results-so-far)). Please report what breaks.
+> **Status: v0.0.3, pre-release.** 105 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** First live tune results on a synthetic stress-test server (`fixtures/company-server.ts`) demonstrated a measured gain from **84% to 91%** accuracy on held-out test prompts (see [Live results so far](#live-results-so-far)). Please report what breaks.
 
 ## Install
 

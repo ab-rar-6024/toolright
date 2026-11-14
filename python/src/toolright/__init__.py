@@ -15,7 +15,7 @@ import subprocess
 import sys
 from typing import List, Optional, Sequence
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 NPM_PACKAGE = "toolright"
 _GUARD = "TOOLRIGHT_PY_LAUNCHER"
