@@ -1,0 +1,609 @@
+{
+  "version": 1,
+  "toolNames": [
+    "read_file",
+    "read_text_file",
+    "read_media_file",
+    "read_multiple_files",
+    "write_file",
+    "edit_file",
+    "create_directory",
+    "list_directory",
+    "list_directory_with_sizes",
+    "directory_tree",
+    "move_file",
+    "search_files",
+    "get_file_info",
+    "list_allowed_directories"
+  ],
+  "prompts": [
+    {
+      "id": "read_file#19iecpi",
+      "text": "Could you fetch the text from /etc/hosts, but only the first 5 entries?",
+      "expected": "read_file",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "read_file#1ebw4kt",
+      "text": "Show me the last 15 lines of /var/log/application.log.",
+      "expected": "read_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "read_file#13ukj8w",
+      "text": "I need the tail of the log file /var/log/syslog, give me the last 30 lines.",
+      "expected": "read_file",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "read_file#18n0fe9",
+      "text": "Give me the first 20 lines of the script located at C:\\\\scripts\\\\deploy.bat.",
+      "expected": "read_file",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "read_file#10wfnjd",
+      "text": "Please return the entire contents of the file /home/user/project/config.yaml.",
+      "expected": "read_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "read_file#1jd66cp",
+      "text": "Read the full text of the README.md file in the repository at /repo/docs/README.md.",
+      "expected": "read_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "read_text_file#12yii7z",
+      "text": "Please give me the full text of /var/log/system.log.",
+      "expected": "read_text_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "read_text_file#1kf545y",
+      "text": "I need to see the top part of the server.log file; can you pull the beginning of it?",
+      "expected": "read_text_file",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "read_text_file#pdt8lo",
+      "text": "Could you retrieve the ending section of the file config.yaml without loading the whole thing?",
+      "expected": "read_text_file",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "read_text_file#3s1zmp",
+      "text": "Show the last 20 lines from /home/bob/projects/report.md.",
+      "expected": "read_text_file",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "read_text_file#a71hvi",
+      "text": "Extract the entire contents of the UTF-8 encoded file ./data/summary.csv.",
+      "expected": "read_text_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "read_text_file#1i7w61u",
+      "text": "Read the first 15 lines of the file located at C:\\Users\\Alice\\Documents\\notes.txt.",
+      "expected": "read_text_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "read_media_file#y2jgu9",
+      "text": "Could you retrieve the raw bytes of the PDF located at /projects/report.pdf?",
+      "expected": "read_media_file",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "read_media_file#p086ic",
+      "text": "Can you provide the base64 data for ./media/animation.gif, including its MIME type?",
+      "expected": "read_media_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "read_media_file#1u3i2jm",
+      "text": "I need the audio file ./music/track01.wav encoded in base64.",
+      "expected": "read_media_file",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "read_media_file#2ci046",
+      "text": "Please read the file at /home/user/pictures/vacation.jpg and give me its base64 representation.",
+      "expected": "read_media_file",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "read_media_file#1gwcmng",
+      "text": "I want the binary data of the archive backup.zip in my backups folder, encoded for me.",
+      "expected": "read_media_file",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "read_media_file#1vu1hi2",
+      "text": "Send me the contents of the document ./files/notes.txt as a base64 block.",
+      "expected": "read_media_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "read_multiple_files#1v2fz7j",
+      "text": "Read the following files and return each with its path: /home/user/docs/intro.pdf, /home/user/docs/chapter1.pdf, /home/user/docs/chapter2.pdf.",
+      "expected": "read_multiple_files",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "read_multiple_files#wcar0c",
+      "text": "I want to compare the data in /var/data/2021.csv and /var/data/2022.csv; please provide their contents.",
+      "expected": "read_multiple_files",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "read_multiple_files#cawwan",
+      "text": "I need to see what's inside these three files: C:\\logs\\app.log, C:\\logs\\error.log, and C:\\logs\\debug.log.",
+      "expected": "read_multiple_files",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "read_multiple_files#ffets1",
+      "text": "Could you pull the text from the files listed in my manifest: /tmp/list1.txt, /tmp/list2.txt, /tmp/list3.txt?",
+      "expected": "read_multiple_files",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "read_multiple_files#jyawuq",
+      "text": "Can you give me the text from the files located at ./config/settings.yaml, ./config/credentials.yaml, and ./config/permissions.yaml?",
+      "expected": "read_multiple_files",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "read_multiple_files#1f2acja",
+      "text": "Please fetch the contents of /data/report1.txt, /data/report2.txt, and /data/summary.md.",
+      "expected": "read_multiple_files",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "write_file#1sb43oa",
+      "text": "Replace the contents of C:\\Data\\report.txt with the text: 'Quarterly earnings increased by 12% compared to last year.'",
+      "expected": "write_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "write_file#1uysquz",
+      "text": "Save this script to /var/www/html/index.php:\\n<?php echo 'Hello World'; ?>",
+      "expected": "write_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "write_file#lf50e7",
+      "text": "Please put the following markdown into docs/README.md: '# Project Overview\\nThis project does ...'",
+      "expected": "write_file",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "write_file#8czbaz",
+      "text": "I need the file /tmp/temp.txt to contain exactly 'Temporary data generated at 2023-09-01 12:00' and nothing else.",
+      "expected": "write_file",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "write_file#wy2qas",
+      "text": "Create a file at /home/user/notes/todo.txt containing the list:\\n- Buy milk\\n- Call Alice\\n- Finish report",
+      "expected": "write_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "write_file#12wm1un",
+      "text": "Overwrite the file ./config/settings.json with the following JSON:\\n{\\\"debug\\\":false,\\\"max_connections\\\":10}",
+      "expected": "write_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "edit_file#s9zuv4",
+      "text": "In docs/CHANGELOG.md, replace the entry for version 1.2.0 with the revised release notes, including new feature bullet points and bug‑fix details.",
+      "expected": "edit_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "edit_file#k5vptf",
+      "text": "Update the Dockerfile at the repository root to change the base image from 'python:3.8-slim' to 'python:3.11-slim' and modify the maintainer label accordingly.",
+      "expected": "edit_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "edit_file#1wtp3xg",
+      "text": "Replace the license block at the top of src/lib/utilities.js with the standard MIT license text.",
+      "expected": "edit_file",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "edit_file#q79uyc",
+      "text": "In the file config/settings.yaml located at /app/config/, replace the lines containing 'debug: true' with 'debug: false' and add a comment '# disabled for production' above them.",
+      "expected": "edit_file",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "edit_file#1prtnu9",
+      "text": "In src/main.py, replace the three lines starting at line 45 that define the 'process_data' function with the new implementation using the updated API.",
+      "expected": "edit_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "edit_file#ddahyc",
+      "text": "Update the header comment in tools/cleanup.sh to show the new author name and today's date.",
+      "expected": "edit_file",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "create_directory#uc852f",
+      "text": "Organize the storage for the upcoming release by adding the necessary paths.",
+      "expected": "create_directory",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "create_directory#l5aznk",
+      "text": "I need a folder named backups inside C:\\Backup\\2026.",
+      "expected": "create_directory",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "create_directory#173m7yb",
+      "text": "Make sure the directory /var/www/html/assets/images exists.",
+      "expected": "create_directory",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "create_directory#1e66no1",
+      "text": "Set up nested directories: ./data/2024/November/reports.",
+      "expected": "create_directory",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "create_directory#1gopny9",
+      "text": "Create a new folder at /home/user/projects/my_app/logs.",
+      "expected": "create_directory",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "create_directory#1tm8xvs",
+      "text": "Prepare the file system for the new analytics module.",
+      "expected": "create_directory",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "list_directory#1v62tg1",
+      "text": "Provide a detailed inventory of the items in /opt/data, including subdirectories, but I only need the names, not their sizes.",
+      "expected": "list_directory",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "list_directory#1ds9zp3",
+      "text": "I need a rundown of everything inside /usr/local/bin, with clear markers for files and directories.",
+      "expected": "list_directory",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "list_directory#plbffi",
+      "text": "Can you list all files and folders in the project folder /home/user/project?",
+      "expected": "list_directory",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "list_directory#1nkduk4",
+      "text": "Give me the full contents of the directory /var/www/html, marking each entry as a file or a folder.",
+      "expected": "list_directory",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "list_directory#gmez2l",
+      "text": "Please show me a complete directory listing for /etc/nginx, distinguishing files from directories.",
+      "expected": "list_directory",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "list_directory#ufyz12",
+      "text": "Show me every entry under /srv/backups, separating files from directories, without any size information.",
+      "expected": "list_directory",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "list_directory_with_sizes#1gve228",
+      "text": "Provide a detailed view of /tmp, with size for each entry and a [FILE]/[DIR] label, sorted by modification date.",
+      "expected": "list_directory_with_sizes",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "list_directory_with_sizes#a1h9q8",
+      "text": "I need a rundown of the contents of /etc, showing which are files or directories and how big they are.",
+      "expected": "list_directory_with_sizes",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "list_directory_with_sizes#w55ipm",
+      "text": "Can you enumerate the items in my Downloads folder, indicating their type and size, and arrange them by name.",
+      "expected": "list_directory_with_sizes",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "list_directory_with_sizes#diupgx",
+      "text": "Show me all items in /home/user/documents, sorted by size and include each entry's size in bytes.",
+      "expected": "list_directory_with_sizes",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "list_directory_with_sizes#1kjdv6s",
+      "text": "Give a full listing of the /var/log directory, indicating whether each entry is a file or a folder, display their sizes, and order from largest to smallest.",
+      "expected": "list_directory_with_sizes",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "list_directory_with_sizes#1a1nfmw",
+      "text": "List everything inside C:\\\\Projects\\\\Alpha, with size details and mark directories separately, sorting alphabetically.",
+      "expected": "list_directory_with_sizes",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "directory_tree#1e6ywgy",
+      "text": "Create a JSON tree of the repository at /srv/git/repo1, omitting any hidden .git files and directories.",
+      "expected": "directory_tree",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "directory_tree#1nxe3wf",
+      "text": "Show the complete folder hierarchy of /etc/nginx, with directories containing a 'children' array, and skip any files named 'default.conf'.",
+      "expected": "directory_tree",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "directory_tree#18z35dy",
+      "text": "I need a JSON dump of every file in /usr/local/bin, organized by subdirectory, but leave out any scripts that start with 'test_'.",
+      "expected": "directory_tree",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "directory_tree#y58goy",
+      "text": "Provide a nested JSON list of the contents of my website folder /var/www/html, excluding any .htaccess files.",
+      "expected": "directory_tree",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "directory_tree#9sjyux",
+      "text": "List all files and subfolders under C:\\Data\\Reports as a nested JSON, but exclude files ending with .tmp.",
+      "expected": "directory_tree",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "directory_tree#1dluz6j",
+      "text": "Give me a JSON representation of the directory tree for /home/alice/projects/myapp, ignoring any '__pycache__' folders.",
+      "expected": "directory_tree",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "move_file#1nbt15r",
+      "text": "Move the script.sh located at /usr/local/bin/scripts to /opt/scripts/script.sh.",
+      "expected": "move_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "move_file#as5zm2",
+      "text": "Please move the report_2023.pdf from /home/user/documents/reports to /home/user/archives/2023_reports/report_2023.pdf.",
+      "expected": "move_file",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "move_file#1kt7ci9",
+      "text": "Please take the log file server.log from its current location and place it in the logs_archive folder, removing it from the original spot.",
+      "expected": "move_file",
+      "kind": "near-miss",
+      "split": "validate"
+    },
+    {
+      "id": "move_file#12a7olz",
+      "text": "Transfer the image file vacation.jpg from the Pictures folder to the Shared/Travel folder, keeping the same name.",
+      "expected": "move_file",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "move_file#ph0m8z",
+      "text": "I need the file data.csv to end up in the backup directory, replacing any existing file there.",
+      "expected": "move_file",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "move_file#1gt8lgh",
+      "text": "Rename the file temp.txt in /var/logs to backup_temp.txt.",
+      "expected": "move_file",
+      "kind": "direct",
+      "split": "train"
+    },
+    {
+      "id": "search_files#qs14rd",
+      "text": "Search the 'logs' directory for every file ending with .log and return their absolute paths.",
+      "expected": "search_files",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "search_files#1vklglv",
+      "text": "Find all README.md files throughout the entire project, including subdirectories.",
+      "expected": "search_files",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "search_files#12u09qe",
+      "text": "Locate every .csv file inside the 'data' folder, but exclude any located in a 'backup' subfolder.",
+      "expected": "search_files",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "search_files#19gy420",
+      "text": "List the full paths of all .png images under the 'assets' directory, searching recursively.",
+      "expected": "search_files",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "search_files#15v9kyf",
+      "text": "Where can I find every LICENSE file in the repository, regardless of its location?",
+      "expected": "search_files",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "search_files#kyfz13",
+      "text": "Give me a list of all Python (.py) scripts that are not stored in the 'tests' folder.",
+      "expected": "search_files",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "get_file_info#45lqh2",
+      "text": "Give me all the file attributes for C:\\Program Files\\MyApp\\app.exe.",
+      "expected": "get_file_info",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "get_file_info#1vcsbag",
+      "text": "I need the full metadata for the folder /home/user/Documents, including its type and last modified time.",
+      "expected": "get_file_info",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "get_file_info#ihe54h",
+      "text": "Please list the details (size, timestamps, access rights) of the directory /etc/nginx.",
+      "expected": "get_file_info",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "get_file_info#7r97o9",
+      "text": "Show me the size, creation date, and permissions of /var/www/html/index.html.",
+      "expected": "get_file_info",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "get_file_info#uuxfmw",
+      "text": "How much space does the backup folder /mnt/backup use and when was it last changed?",
+      "expected": "get_file_info",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "get_file_info#5vwvd3",
+      "text": "What are the ownership and permission bits on the script /usr/local/bin/deploy.sh?",
+      "expected": "get_file_info",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "list_allowed_directories#ndwvcg",
+      "text": "Please list all the top‑level directories I’m permitted to read on this server.",
+      "expected": "list_allowed_directories",
+      "kind": "direct",
+      "split": "test"
+    },
+    {
+      "id": "list_allowed_directories#n2gipc",
+      "text": "I need to know if I can open files under /tmp/cache; list the accessible directories for me.",
+      "expected": "list_allowed_directories",
+      "kind": "near-miss",
+      "split": "test"
+    },
+    {
+      "id": "list_allowed_directories#1775hl3",
+      "text": "Show the directories, including subfolders, that I’m allowed to access.",
+      "expected": "list_allowed_directories",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "list_allowed_directories#1276pkz",
+      "text": "What root folders does the system expose for file operations?",
+      "expected": "list_allowed_directories",
+      "kind": "direct",
+      "split": "validate"
+    },
+    {
+      "id": "list_allowed_directories#ixn956",
+      "text": "Can you confirm whether /etc/config is reachable from the allowed paths?",
+      "expected": "list_allowed_directories",
+      "kind": "near-miss",
+      "split": "train"
+    },
+    {
+      "id": "list_allowed_directories#17f55jl",
+      "text": "Give me the full set of allowed folder paths so I can plan my file searches.",
+      "expected": "list_allowed_directories",
+      "kind": "direct",
+      "split": "train"
+    }
+  ]
+}
