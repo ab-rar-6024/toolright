@@ -75,6 +75,8 @@ export function descriptionDiff(r: TuneResult): string {
   return out.join("\n");
 }
 
+export { generateHtmlReport } from "./html.js";
+
 export function tuneJson(r: TuneResult) {
   const testIds = new Set(r.final[0]?.items.map((i) => i.promptId) ?? []);
   return {

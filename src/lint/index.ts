@@ -11,6 +11,7 @@ import {
 import { lintStructure, type Finding, type Severity } from "./structure.js";
 
 export type { Finding, Severity };
+export { formatLintMarkdown } from "./comment.js";
 
 export interface LintOptions {
   method?: SimilarityMethod;

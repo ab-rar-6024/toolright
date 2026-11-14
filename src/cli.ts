@@ -7,13 +7,15 @@ import { attachBranding } from "./brand.js";
 import { VERSION } from "./version.js";
 import { Budget, BudgetExceeded, estimateTokensPerCall, evaluate } from "./eval/run.js";
 import { generatePrompts, loadPrompts, promptCoverage, savePrompts, type TestPrompt } from "./gen/prompts.js";
-import { exitCode, formatLint, lint } from "./lint/index.js";
+import { exitCode, formatLint, formatLintMarkdown, lint } from "./lint/index.js";
 import { siblingMap, type SimilarityMethod } from "./lint/overlap.js";
 import type { Severity } from "./lint/structure.js";
 import { loadTools, type ToolInfo, type ToolSource } from "./mcp/connect.js";
 import { createProvider, type Provider } from "./providers/index.js";
-import { descriptionDiff, evalReport, tuneJson, tuneReport } from "./report/index.js";
+import { descriptionDiff, evalReport, generateHtmlReport, tuneJson, tuneReport } from "./report/index.js";
 import { tune } from "./tune/index.js";
+import { ingestLogs } from "./gen/ingest.js";
+import { startMcpServer } from "./server.js";
 
 const program = new Command();
 program.name("toolright").description("Does your agent pick the right tool?").version(VERSION);
@@ -126,6 +128,7 @@ withServer(
     .command("lint")
     .description("Tier 1: instant checks, no model and no API key")
     .option("--json", "print JSON")
+    .option("--markdown", "print Markdown (useful for GitHub PR comments and summaries)")
     .option("--embeddings", "use a small local embedding model for overlap (experimental; needs @huggingface/transformers)")
     .option("--threshold <n>", "similarity above which two tools count as confusable (0-1)", unit("--threshold"))
     .option("--fail-on <level>", "exit 1 on findings at this level or worse: error | warn | info | none", "error"),
@@ -134,7 +137,13 @@ withServer(
   const tools = await loadTools(source(opts, server));
   const method: SimilarityMethod = opts.embeddings ? "embeddings" : "lexical";
   const result = await lint(tools, { method, threshold: opts.threshold });
-  console.log(opts.json ? JSON.stringify(result, null, 2) : formatLint(result, process.stdout.isTTY));
+  if (opts.json) {
+    console.log(JSON.stringify(result, null, 2));
+  } else if (opts.markdown) {
+    console.log(formatLintMarkdown(result));
+  } else {
+    console.log(formatLint(result, process.stdout.isTTY));
+  }
   process.exitCode = exitCode(result, opts.failOn as Severity | "none");
 });
 
@@ -282,8 +291,9 @@ evalOptions(withServer(program.command("eval").description("Measure how often ea
     await mkdir(opts.out, { recursive: true });
     await writeFile(join(opts.out, "eval.md"), md);
     await writeFile(join(opts.out, "eval.json"), JSON.stringify({ results, prompts: finalPrompts }, null, 2));
+    await writeFile(join(opts.out, "eval.html"), generateHtmlReport("Eval Run", { evalResults: results, prompts: finalPrompts }));
     console.log(md);
-    console.error(`Saved to ${opts.out}/. ${budget.calls} model calls used.`);
+    console.error(`Saved to ${opts.out}/ (eval.md, eval.json, eval.html). ${budget.calls} model calls used.`);
   },
 );
 
@@ -333,11 +343,45 @@ evalOptions(
   await mkdir(opts.out, { recursive: true });
   await writeFile(join(opts.out, "report.md"), tuneReport(result));
   await writeFile(join(opts.out, "report.json"), JSON.stringify(tuneJson(result), null, 2));
+  await writeFile(join(opts.out, "report.html"), generateHtmlReport("Tune Run", { tuneResult: result, prompts: finalPrompts }));
   await writeFile(join(opts.out, "descriptions.diff"), descriptionDiff(result));
   await savePrompts(join(opts.out, "prompts.json"), tools, finalPrompts);
   console.log(tuneReport(result));
-  console.error(`Saved report.md, report.json, descriptions.diff, prompts.json to ${opts.out}/. ${budget.calls} model calls used.`);
+  console.error(`Saved report.md, report.json, report.html, descriptions.diff, prompts.json to ${opts.out}/. ${budget.calls} model calls used.`);
 });
+
+// ---------- ingest-logs ----------
+program
+  .command("ingest-logs <file>")
+  .description("Extract evaluation prompts from real agent conversation logs (JSONL)")
+  .option("-o, --out <file>", "prompts output file", "prompts.json")
+  .option("--tools <file>", "filter prompts to match tools in this snapshot")
+  .action(async (file: string, opts) => {
+    let allowed: string[] | undefined;
+    if (opts.tools) {
+      const tools = await loadTools({ toolsFile: opts.tools });
+      allowed = tools.map((t) => t.name);
+    }
+    const prompts = await ingestLogs(file, allowed);
+    if (prompts.length === 0) {
+      log(`No tool call prompts could be extracted from ${file}.`);
+      return;
+    }
+    await savePrompts(
+      opts.out,
+      allowed ? allowed.map((n) => ({ name: n, description: "", inputSchema: { type: "object" } })) : [],
+      prompts,
+    );
+    console.log(`Extracted ${prompts.length} real prompts and saved to ${opts.out}.`);
+  });
+
+// ---------- serve (MCP server) ----------
+program
+  .command("serve")
+  .description("Run Toolright as an MCP server over stdio for agents (Claude Desktop, Cursor, etc.)")
+  .action(async () => {
+    await startMcpServer();
+  });
 
 program.parseAsync().catch((err) => {
   console.error(err instanceof Error ? err.message : err);

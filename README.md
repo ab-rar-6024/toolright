@@ -19,7 +19,7 @@ Test your MCP server's tool descriptions against real models, then keep only the
 
 ---
 
-> **Status: v0.0.3, pre-release.** 105 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** First live tune results on a synthetic stress-test server (`fixtures/company-server.ts`) demonstrated a measured gain from **84% to 91%** accuracy on held-out test prompts (see [Live results so far](#live-results-so-far)). Please report what breaks.
+> **Status: v0.0.3, pre-release.** 111 automated tests pass (unit, real stdio and HTTP MCP transports, security, a fuzz run). **Tier 2 has been run live end to end with Ollama (`qwen2.5:3b`), and Tier 3 cloud provider testing has been verified live on Groq (`openai/gpt-oss-120b`).** First live tune results on a synthetic stress-test server (`fixtures/company-server.ts`) demonstrated a measured gain from **84% to 91%** accuracy on held-out test prompts (see [Live results so far](#live-results-so-far)). Please report what breaks.
 
 ## Install
 
@@ -195,9 +195,10 @@ While synthetic fixtures prove the tune loop works end-to-end, published results
 - [ ] Run on 5-10 popular MCP servers and publish real before/after numbers (started: `@modelcontextprotocol/server-filesystem` tested)
 - [x] Verify Tier 2 live with Ollama
 - [x] Verify Tier 3 cloud providers live (verified with Groq)
-- [ ] GitHub Action with a PR comment showing the description diff
-- [ ] Ship Toolright itself as an MCP server (`audit_tools`)
-- [ ] Prompts mined from real agent logs
+- [x] GitHub Action (`action.yml`) with automated PR comments
+- [x] Ship Toolright itself as an MCP server (`toolright serve` with `lint_tools`)
+- [x] Prompts mined from real agent logs (`toolright ingest-logs`)
+- [x] Standalone visual HTML reports (`report.html` and `eval.html`)
 
 ## Documentation
 
@@ -213,7 +214,7 @@ Issues and pull requests are welcome. Start with a failing test that shows the p
 
 ```bash
 npm install
-npm test          # 105 tests: unit, integration, security; no network or keys needed
+npm test          # 111 tests: unit, integration, security; no network or keys needed
 npm run typecheck
 npm run build
 ```

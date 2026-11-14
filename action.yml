@@ -3,10 +3,19 @@ description: Fail the build when MCP tool descriptions are missing, vague, or co
 inputs:
   tools:
     description: Path to a tools snapshot JSON made with `toolright list --json`
-    required: true
+    required: false
+  server:
+    description: Server command to execute (e.g. "node server.js") if not using a snapshot file
+    required: false
   fail-on:
     description: error | warn | info | none
     default: error
+  comment-on-pr:
+    description: Set to "true" to automatically post or update a lint report comment on the pull request
+    default: "false"
+  github-token:
+    description: GitHub token for posting PR comments (e.g. ${{ secrets.GITHUB_TOKEN }})
+    required: false
 runs:
   using: composite
   steps:
@@ -14,4 +23,53 @@ runs:
       with:
         node-version: 22
     - shell: bash
-      run: npx --yes toolright lint --tools "${{ inputs.tools }}" --fail-on "${{ inputs.fail-on }}"
+      id: run-lint
+      run: |
+        ARGS=""
+        if [ -n "${{ inputs.tools }}" ]; then
+          ARGS="--tools ${{ inputs.tools }}"
+        fi
+        if [ -n "${{ inputs.server }}" ]; then
+          ARGS="$ARGS -- ${{ inputs.server }}"
+        fi
+
+        # Generate markdown report
+        npx --yes toolright@0.0.3 lint $ARGS --markdown > toolright-lint-report.md 2>&1 || true
+
+        # Run with fail-on to set exit status
+        npx --yes toolright@0.0.3 lint $ARGS --fail-on "${{ inputs.fail-on }}"
+    - name: Comment on PR
+      if: always() && inputs.comment-on-pr == 'true' && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token || github.token }}
+        script: |
+          const fs = require('fs');
+          if (!fs.existsSync('toolright-lint-report.md')) return;
+          const body = fs.readFileSync('toolright-lint-report.md', 'utf8');
+          const header = '<!-- toolright-lint-comment -->';
+          const fullBody = `${header}\n${body}`;
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const existing = comments.find(c => c.body.includes(header));
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body: fullBody,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: fullBody,
+            });
+          }
+
